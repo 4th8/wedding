@@ -5,9 +5,10 @@ CREATE EXTENSION pgcrypto;
 CREATE TABLE users (username text NOT NULL PRIMARY KEY,
                     password text NOT NULL);
 
-INSERT INTO users (username, password) VALUES ('4th8', crypt('0328940', gen_salt('bf')));
+INSERT INTO users (username, password) VALUES ('4th8', crypt('0328940', gen_salt('bf'))),
+                                              ('Heather', crypt('hewnew', gen_salt('bf')));
                     
-CREATE TABLE messages (username text NOT NULL,
+CREATE TABLE messages (username text NOT NULL references users(username),
                        message text NOT NULL default '',
                        id SERIAL NOT NULL PRIMARY KEY);
 
@@ -22,6 +23,6 @@ CREATE TABLE gifts (name text PRIMARY KEY NOT NULL,
                     link text,
                     recieved VARCHAR(1) default 'F');
 
-CREATE TABLE rooms (id serial PRIMARY KEY NOT NULL,
-                    roomname text NOT NULL,
-                    username VARCHAR(25) NOT NULL references users(username));
+CREATE TABLE rooms (roomname text NOT NULL,
+                    username text NOT NULL references users(username),
+                    PRIMARY KEY (roomname,username));
