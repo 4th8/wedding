@@ -54,12 +54,9 @@ def createNewAccount():
   last = request.form['last']
   if un == '':
     return render_template('createAccount.html', username = username, responseText = 'Please enter a username')
-  cur.execute("SELECT * FROM users WHERE username = %s;" , (un,))
-  if cur.fetchone():
-    return render_template('createAccount.html', username = username, responseText = 'That username is already taken')
+  cur.execute("SELECT * FROM guests WHERE first_name = %s AND last_name = %s AND NOT EXISTS(SELECT * FROM guests WHERE username = %s) AND NOT EXISTS(SELECT * FROM users WHERE username = %s) AND EXISTS(SELECT * FROM guests WHERE first_name = %s AND last_name = %s AND username IS NULL);" , (first, last, un, un, first, last))
   if pw == '':
     return render_template('createAccount.html', username = username, responseText = 'Please enter a password')
-  cur.execute("SELECT * FROM guests WHERE first_name = %s AND last_name = %s;", (first, last));
   if cur.fetchone():
     cur.execute("INSERT INTO users (username, password) VALUES(%s, crypt(%s, gen_salt('bf')));" , (un, pw))
     cur.execute("UPDATE guests SET username = %s WHERE first_name = %s AND last_name = %s;",(un, first, last))
