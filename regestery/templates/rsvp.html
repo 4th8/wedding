@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">	
+	<!-- Features -->
+	<div class="row">
+		<section class="6u">
+			<h1>People who are going to be there.</h1>
+			<table>
+				<th>Name</th>
+				{% for guest in guests %}
+				<tr>
+					<td>{{guest.first_name}} {{guest.last_name}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</section>
+	</div>
+</div>
+{% endblock %}
