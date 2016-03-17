@@ -28,7 +28,7 @@ chatApp.controller('chatcontroller', function($scope) {
         }
     };
     
-    socket.on('room', function(msg) {
+    socket.on('rooms', function(msg) {
         $scope.rooms.push(msg);
         $scope.$apply();
         console.log(msg);
