@@ -158,12 +158,37 @@ def login():
     if cur.fetchone():
       print('Login successful as ' + username)
       session['username'] = username
-      return render_template('index.html', username=username, date=date, past=past)
+      if username == 'administrator':
+        return render_template('adminIndex.html', username=username, date=date, past=past)
+      else:
+        return render_template('index.html', username=username, date=date, past=past)
     else:
       return render_template('login.html', username = 'Not logged in', feedback = 'Invalid username and password')
     
     
   
+@app.route('/RsvpList')
+def populateRsvpList():
+  if 'username' in session:
+    username = session['username']
+  else:
+    username = 'Not logged in'
+  if username != 'administrator':
+    return render_template('rsvp2.html', username=username)
+  conn = connectToGuestDB()
+  cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+  cur.execute("SELECT first_name, last_name FROM guests WHERE rsvp = 'Y';")
+  yes = cur.fetchall();
+  cur.execute("SELECT first_name, last_name FROM guests WHERE rsvp = 'N';")
+  no = cur.fetchall()
+  cur.execute("SELECT first_name, last_name FROM guests WHERE rsvp = 'F';")
+  noResponse = cur.fetchall()
+  cur.execute("SELECT SUM(number_of_extras) AS num FROM guests where rsvp = 'Y';")
+  number = cur.fetchone()
+  print number
+  return render_template('adminRSVP.html', username = username, yes = yes, no = no, noResponse = noResponse, number = number)
+  
+
 @app.route('/chatRooms')
 def chatroom():
   if 'username' in session:
@@ -182,7 +207,10 @@ def mainIndex():
     print('Username: ' , session['username'])
   else:
     username = 'Not Logged in'
-  return render_template('index.html',date=date, past=past, username=username)
+  if username == 'administrator':
+    return render_template('adminIndex.html', date=date, past=past, username = username)
+  else:
+    return render_template('index.html',date=date, past=past, username=username)
 	
 @app.route('/bridal')
 def apage():

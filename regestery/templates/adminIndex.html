@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">	
+	<!-- Features -->
+	<div class="row">
+		<section class="6u">
+			<h1>Administrator Home Page.</h1>
+			{% if past %}
+			<p>The wedding has already taken place.  Ms. Heather Burgess is now Mrs. Heather Woodhead</p>
+			{% else %}
+			<p>The wedding will take place on {{date.month}} {{date.day}}, {{date.year}}. At Saint Mary's Catholic Church. All are welcome to the ceremony but the reception is by invitation only. The ceremony will begin at 1400 and will last tell about 1530. The reception will take place at 1600 at the <a href<="http://www.innattheoldesilkmill.com/">Inn at the Old Silk Mill</a>. Visitors from out of town please visit thier website to book rooms for the night.</p>
+			{% endif %}		
+		</section>
+		<section class="6u">
+			<h2>Admin links</h2>
+			<a href='RsvpList'>RSVP List</a></li>
+		</section>					
+	</div>
+</div>
+{% endblock %}

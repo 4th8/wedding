@@ -5,6 +5,8 @@ CREATE EXTENSION pgcrypto;
 CREATE TABLE users (username text NOT NULL PRIMARY KEY,
                     password text NOT NULL);
 
+INSERT INTO users (username, password) VALUES ('administrator', crypt('password', gen_salt('bf')));
+
 CREATE TABLE messages (username text NOT NULL references users(username),
                        message text NOT NULL default '',
                        room text NOT NULL default 'public',
@@ -37,6 +39,7 @@ CREATE TABLE rooms (roomname text NOT NULL,
 GRANT ALL ON users to usercontrol;
 GRANT ALL ON messages to messagecontrol;
 GRANT ALL ON messages_id_seq to messagecontrol;
-GRANT ALL ON guests to guestcontrol;
+ GRANT ALL ON guests to guestcontrol;
 GRANT ALL ON rooms to messagecontrol;
 GRANT ALL ON guests to usercontrol;
+\i Addresses.sql 

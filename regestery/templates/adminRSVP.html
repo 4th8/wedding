@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">	
+
+	<h1>Guest Count: {{number.num}}</h1>
+	
+	<!-- Features -->
+	<div class="row">
+		<section class="6u">
+			<h1>RSVP List</h1>
+			<h2>People who have said yes.</h2>
+			<table>
+				<th>First Name</th><th>Last Name</th>
+				{% for y in yes %}
+				<tr>
+					<td>{{y.first_name}}</td> <td>{{y.last_name}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</section>					
+			<section class="6u">
+			<h2>People who have said no.</h2>
+			<table>
+				<th>First Name</th><th>Last Name</th>
+				{% for y in no %}
+				<tr>
+					<td>{{y.first_name}}</td> <td>{{y.last_name}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</section>	
+			<section class="6u">
+			<p></p>
+			<h2>People who have not yet responded.</h2>
+			<table>
+				<th>First Name</th><th>Last Name</th>
+				{% for y in noResponse %}
+				<tr>
+					<td>{{y.first_name}}</td> <td>{{y.last_name}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</section>					
+	</div>
+</div>
+{% endblock %}
