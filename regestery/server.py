@@ -18,6 +18,13 @@ thenames = ['Nathan Woodhead','Heather Burgess']
 
 regesteredGuests = [{'Name' : 'Nathan Woodhead', 'Phone' : 5408548888, 'Address' : "301 cracked street",'numGuests' : 10}]
 
+
+
+
+
+
+
+
 @socketio.on('createNewRoom', namespace='/chat')
 def createNewRoom(username, roomname):
   conn= connectToMessageDB()
@@ -33,6 +40,14 @@ def createNewRoom(username, roomname):
 def autoLogin(username):
   session['username'] = username
 
+
+
+
+
+
+
+
+
 @app.route('/createAccount', methods = ['POST', 'GET'])
 def loadCreatePage():
   if 'username' in session:
@@ -40,7 +55,15 @@ def loadCreatePage():
     return render_template('createAccount.html', username = username, responseText = '')
   else:
     return render_template('createAccount.html', username = 'Not logged in', responseText = '')
-    
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
 @app.route('/newaccount', methods=['POST','GET'])
 def createNewAccount():
   username = ''
@@ -67,6 +90,12 @@ def createNewAccount():
     return render_template('createAccount.html', username = username, responseText = 'You are not on the list.')
   
 
+
+
+
+
+
+
 @socketio.on('createChat', namespace='/chat')
 def loginChat():
   print('Trying to pass username to socketio')
@@ -76,6 +105,12 @@ def loginChat():
     session['roomname'] = 'public'
   else:
     emit('login', '')
+
+
+
+
+
+
 
 
 
@@ -91,6 +126,14 @@ def search(text):
     print(result)
     emit ('search', result)
 
+
+
+
+
+
+
+
+
 @socketio.on('connect', namespace='/chat')
 def makeConnection():
     conn = connectToMessageDB()
@@ -105,6 +148,12 @@ def makeConnection():
     rooms = cur.fetchall()
     for room in rooms:
       emit('room', room[0])
+
+
+
+
+
+
 
 @socketio.on('chat', namespace='/chat')
 def chat(text, username):
@@ -147,7 +196,45 @@ def connectToMessageDB():
     return psycopg2.connect(connectionString)
   except:
     print("Can't connect to database")
-    
+
+
+
+
+
+
+
+
+
+@app.route('/addtoRegistry', methods =['POST'])
+def addGift():
+  if 'username' in session:
+      username = session['username']
+  else:
+    username = 'Not Logged in'
+    return render_template('login.html', username = 'Not logged in', feedback = 'Please login as administrator')
+  conn = connectToGuestDB()
+  cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+  url = request.form['url']
+  name = request.form['name']
+  picture = request.form['pict']
+  price = float(request.form['price'])
+  print price
+  try:
+    cur.execute("INSERT INTO gifts (name, link, price, picture) VALUES (%s, %s, %s, %s);",(name, url, price, picture))
+    conn.commit()
+    return render_template('adminRegistry.html', username=username, feedback = 'Insert Successful')
+  except:
+    return render_template('adminRegistry.html', username=username, feedback = 'Insert Failed')
+  
+  
+
+
+
+
+
+
+
+
 @app.route('/logintry', methods =['POST'])
 def login():
     conn = connectToUserDB()
@@ -167,6 +254,13 @@ def login():
     
     
   
+
+
+
+
+
+
+
 @app.route('/RsvpList')
 def populateRsvpList():
   if 'username' in session:
@@ -189,6 +283,14 @@ def populateRsvpList():
   return render_template('adminRSVP.html', username = username, yes = yes, no = no, noResponse = noResponse, number = number)
   
 
+
+
+
+
+
+
+
+
 @app.route('/chatRooms')
 def chatroom():
   if 'username' in session:
@@ -200,6 +302,14 @@ def chatroom():
   return render_template('chatRooms.html', username=username)
   
   
+
+
+
+
+
+
+
+
 @app.route('/')
 def mainIndex():
   if 'username' in session:
@@ -212,6 +322,14 @@ def mainIndex():
   else:
     return render_template('index.html',date=date, past=past, username=username)
 	
+
+
+
+
+
+
+
+
 @app.route('/bridal')
 def apage():
   if session.has_key('username'):
@@ -220,6 +338,13 @@ def apage():
     username = 'Not Logged in'
   return render_template('bridalParty.html', username=username)
 
+
+
+
+
+
+
+
 @app.route('/login')
 def loginPage():
   if 'username' in session:
@@ -227,6 +352,12 @@ def loginPage():
   else:
     username = 'Not Logged in'
   return render_template('login.html', username=username, feedback = '')
+
+
+
+
+
+
 
 @app.route('/countdown')
 def count():
@@ -237,7 +368,28 @@ def count():
     diff = datetime.datetime(2016, 9, 3) - datetime.datetime.today()
     days = diff.days
     return render_template('countdown.html', dayz=days, date=date, past=past, username=username)
-    
+
+
+
+
+
+
+
+@app.route('/adminReg')
+def admin():
+  if 'username' in session:
+      username = session['username']
+      if(username == 'administrator'):
+        return render_template('adminRegistry.html', username=username)
+  else:
+    username = 'Not Logged in'
+
+
+
+
+
+
+
 @app.route('/chat')
 def chatPage():
   if 'username' in session:
@@ -246,16 +398,74 @@ def chatPage():
     username = 'Not Logged in'
   return render_template('chat.html', username=username)
 
+
+
+
+
+@app.route('/removeFromRegistry', methods = ['POST'])
+def takeoff():
+  conn = connectToGuestDB()
+  cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+  if 'username' in session:
+    username = session['username']
+  else:
+    cur.execute("SELECT * FROM gifts WHERE recieved = 'F';")
+    want = cur.fetchall()
+    return render_template('registry.html', iwant = want, username=username, feedback = 'You must be logged in to claim a gift')
+  for box in request.form:
+    if box != 'Submit':
+      try:
+        cur.execute("UPDATE gifts SET recieved = 'T' where name = %s;", (box,))
+        print cur.mogrify("INSERT INTO thankyous (gift, username) VALUES (%s, %s);" ,(box, username))
+        cur.execute("INSERT INTO thankyous (gift, username) VALUES (%s, %s);" ,(box, username))
+        feedback = 'Thank you for the ' + box
+        print feedback
+        conn.commit()
+        cur.execute("SELECT * FROM gifts WHERE recieved = 'F';")
+        want = cur.fetchall()
+        return render_template('registry.html', iwant = want, username=username, feedback = feedback)
+      except:
+        conn.rollback()
+        feedback = 'Error'
+        cur.execute("SELECT * FROM gifts WHERE recieved = 'F';")
+        want = cur.fetchall()
+        return render_template('registry.html', iwant = want, username=username, feedback = feedback)
+        
+        
+        
+        
+        
 @app.route('/registry')
 def stuff():
   if 'username' in session:
       username = session['username']
   else:
     username = 'Not Logged in'
-  want = ['http://store.ssgtactical.com/product.iwi-us-inc-tavor-semi-automatic-9mm-17-black-bullpup-1-mag-32rd-adjustable-sights-tsb17-9-34', 'http://store.ssgtactical.com/product.century-arms-international-922r-fury-12-gauge-semi-auto-1-10rd-us-24', 'http://store.ssgtactical.com/product.kimber-solo-carry-9mm-1039']
-  
+  conn = connectToGuestDB()
+  cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+  cur.execute("SELECT * FROM gifts WHERE recieved = 'F';")
+  want = cur.fetchall()
   return render_template('registry.html', iwant = want, username=username)
-    
+
+
+
+
+
+
+@app.route('/thankyou')
+def thanks():
+  if 'username' in session:
+      username = session['username']
+  else:
+    return render_template('login.html', username=username, feedback = '')
+  conn = connectToGuestDB()
+  cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+  cur.execute("SELECT thankyous.gift, guests.first_name AS first, guests.last_name AS last, guests.address FROM thankyous JOIN guests ON (thankyous.username = guests.username);")
+  gifts = cur.fetchall()
+  return render_template('thankyou.html', gifts = gifts, username=username)
+
+
+
 @app.route('/rsvp', methods=['POST', 'GET'])
 def rsvp():
   if 'username' in session:
@@ -288,6 +498,11 @@ def rsvp():
   return render_template('rsvp2.html', guests=results, username=username)
   
   
+
+
+
+
+
 @socketio.on('joinRoom', namespace='/chat')
 def on_join(roomname):
     print "Joining room"

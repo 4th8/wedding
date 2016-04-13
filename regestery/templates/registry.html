@@ -4,16 +4,20 @@
 <div class="container">	
 	<!-- Features -->
 	<div class="row">
-		<section class="6u">
+		<section class="6u"> 
 			<h1>Registry</h1>
-			<h2>Things that Nathan wants.</h2>
+			<h2>Welcome to the registry page. Here you will find a list of the things that Heather and Nathan have asked for as wedding gifts. If you have already purchaced any of these please let us know so we can remove it from this list. That way we will not end up with 25 SIG 226.</h2>
+			<table>
+			<form method = 'POST' action = '/removeFromRegistry'>
 			{% for want in iwant %}
-			<a href='{{want}}'>{{want}}</a>
+			<th></th><th>Name</th><th>Price</th><th>Buy this</th>
+			<tr><td><img src="{{want.picture}}"></img></td><td><a href='{{want.link}}'>{{want.name}}</a></td><td>{{want.price}}</td><td><input type = 'checkbox' name = '{{want.name}}' ></td></tr>
 			{% endfor %}
-			<h2>Things Heather wants.</h2>
-			<p>Heather is regestered <a href='https://www.blueprintregistry.com/registry/HeatherandNathan09.03.16'>with Blueprint.</a></p>
+			</table>
+			<input type="submit" name="Submit"/>
+			</form>
 		</section>
-		
+		{{feedback}}
 	</div>
 </div>
 {% endblock %}
